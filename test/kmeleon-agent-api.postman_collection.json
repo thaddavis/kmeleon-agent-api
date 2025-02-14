@@ -1,0 +1,24 @@
+{
+	"info": {
+		"_postman_id": "08032d40-16f7-4def-8764-70e987e96e65",
+		"name": "kmeleon",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32180947"
+	},
+	"item": [
+		{
+			"name": "healthcheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_URL}}",
+					"host": [
+						"{{API_URL}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
