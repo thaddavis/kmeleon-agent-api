@@ -9,6 +9,7 @@ from slowapi.util import get_remote_address
 
 from .routers import (
   healthcheck,
+  chat
 )
 
 # from src.db.database import Base, engine
@@ -51,10 +52,10 @@ app.add_middleware(SlowAPIMiddleware)
 
 app.include_router(healthcheck.router, prefix="")
 
-# app.include_router(
-#     rawLLM.router,
-#     prefix="/api/raw-llm",
-# )
+app.include_router(
+    chat.router,
+    prefix="/api",
+)
 
 # app.include_router(
 #     noRagAgent.router,

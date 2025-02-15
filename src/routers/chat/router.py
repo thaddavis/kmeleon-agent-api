@@ -1,25 +1,26 @@
 from fastapi import APIRouter, Request
-from langchain_openai import ChatOpenAI
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from src.core.schemas.Prompt import Prompt
-import json
+from langgraph.prebuilt import create_react_agent
 import os
-from fastapi.responses import StreamingResponse
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.callbacks import LangChainTracer
+from langchain_core.tracers import LangChainTracer
+from langchain_community.tools.tavily_search import TavilySearchResults
+from langgraph.checkpoint.postgres import PostgresSaver
 from langsmith import Client
-from src.deps import jwt_dependency
+from psycopg_pool import ConnectionPool
+from src.core.tools.get_weather import get_weather
 
 limiter = Limiter(key_func=get_remote_address)
 
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
 callbacks = [
   LangChainTracer(
-    project_name="raw-llm",
+    project_name=os.getenv("LANGSMITH_PROJECT"),
     client=Client(
       api_url=os.getenv("LANGCHAIN_ENDPOINT"),
       api_key=os.getenv("LANGCHAIN_API_KEY")
@@ -29,40 +30,30 @@ callbacks = [
 
 router = APIRouter()
 
-async def generator(prompt: str):
-    
-    model: str = "gpt-4o-mini"
-    llm = ChatOpenAI(model=model, api_key=os.getenv("OPENAI_API_KEY"))
-    # model: str = "claude-3-5-sonnet-20240620"
-    # llm = ChatAnthropic(model_name=model, temperature=0.2, max_tokens=1024)
-
-    promptTemplate = ChatPromptTemplate.from_messages(
-        [
-            ("system", "You're an assistant. Bold key terms in your responses."),
-            ("human", "{input}"),
-        ]
-    )
-
-    messages = promptTemplate.format_messages(input=prompt)
-
-    async for evt in llm.astream_events(messages, version="v1", config={"callbacks": callbacks}, model=model):
-        if evt["event"] == "on_chat_model_start":
-            yield json.dumps({
-                "event": "on_chat_model_start"
-            }, separators=(',', ':'))
-
-        elif evt["event"] == "on_chat_model_stream":
-            yield json.dumps({
-                "event": "on_chat_model_stream",
-                "data": evt["data"]['chunk'].content
-            }, separators=(',', ':'))
-
-        elif evt["event"] == "on_chat_model_end":
-            yield json.dumps({
-                "event": "on_chat_model_end"
-            }, separators=(',', ':'))
-
-@router.post("/completion")
+@router.post("/chat")
 @limiter.limit("10/minute")
-def prompt(prompt: Prompt, jwt: jwt_dependency, request: Request):
-    return StreamingResponse(generator(prompt.prompt), media_type='text/event-stream')
+def prompt(prompt: Prompt, request: Request):
+    DB_URI=os.getenv("DB_URI")
+    connection_kwargs = {
+      "autocommit": True,
+      "prepare_threshold": 0,
+    }
+
+    with ConnectionPool(
+      conninfo=DB_URI,
+      max_size=20,
+      kwargs=connection_kwargs,
+    ) as pool:
+      checkpointer = PostgresSaver(pool)
+      checkpointer.setup()
+      
+      # search = TavilySearchResults(max_results=2)
+      tools = [get_weather]
+      
+      model: str = "gpt-4o-mini"
+      graph = create_react_agent(model, prompt=f"You are a helpful assistant. Today's date is {datetime.now().strftime("%Y-%m-%d")}.", tools=tools, checkpointer=checkpointer)
+      config = {"configurable": {"thread_id": f"{ prompt.thread_id}"}}
+      res = graph.invoke({"messages": [("human", f"{prompt.content}")]}, config)
+      
+      last_message = res["messages"][-1].content
+      return {"completion": last_message}
