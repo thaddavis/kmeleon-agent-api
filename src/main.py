@@ -9,7 +9,8 @@ from slowapi.util import get_remote_address
 
 from .routers import (
   healthcheck,
-  chat
+  chat,
+  auth
 )
 
 # from src.db.database import Base, engine
@@ -57,23 +58,8 @@ app.include_router(
     prefix="/api",
 )
 
-# app.include_router(
-#     noRagAgent.router,
-#     prefix="/api/no-rag-agent",
-# )
-
-# app.include_router(
-#     ragAgent.router,
-#     prefix="/api/rag-agent",
-# )
-
-# app.include_router(
-#     reActAgent.router,
-#     prefix="/react-agent",
-# )
-
-# app.include_router(
-#     auth.router,
-#     prefix='/api/auth',
-#     tags=['auth'],
-# )
+app.include_router(
+    auth.router,
+    prefix='/api/auth',
+    tags=['auth'],
+)

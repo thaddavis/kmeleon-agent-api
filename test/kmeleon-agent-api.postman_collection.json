@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "08032d40-16f7-4def-8764-70e987e96e65",
-		"name": "kmeleon-agent-api",
+		"name": "Kmeleon Agent API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "32180947"
 	},
@@ -23,8 +23,83 @@
 		{
 			"name": "chat",
 			"request": {
-				"method": "GET",
-				"header": []
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"content\": \"What was the weather like in Miami last week?\",\n    \"thread_id\": \"23\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/api/chat",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"api",
+						"chat"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create account",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"a@a.com\",\n    \"password\": \"abc123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/api/auth/create-account",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"create-account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "log in",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"a@a.com\",\n    \"password\": \"abc123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/api/auth/log-in",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"log-in"
+					]
+				}
 			},
 			"response": []
 		}

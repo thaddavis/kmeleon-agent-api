@@ -13,6 +13,7 @@ from src.core.tools import (
    get_historical_weather_data_for_timestamp
 )
 from src.config.db_config import connection_kwargs
+from src.middleware.get_current_user import jwt_dependency
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -35,7 +36,7 @@ router = APIRouter()
 
 @router.post("/chat")
 @limiter.limit("10/minute")
-def prompt(prompt: Prompt, request: Request):
+def prompt(prompt: Prompt, jwt: jwt_dependency, request: Request):
     with ConnectionPool(
       conninfo=os.getenv("DB_URI"),
       max_size=20,
