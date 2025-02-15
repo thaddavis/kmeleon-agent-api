@@ -44,12 +44,12 @@ def prompt(prompt: Prompt, jwt: jwt_dependency, request: Request):
     ) as pool:
       checkpointer = PostgresSaver(pool)
       checkpointer.setup()
-      
+
       tools = [get_current_and_forecasted_weather,get_historical_weather_data_for_timestamp]
       
       model: str = "gpt-4o-mini"
       graph = create_react_agent(model, prompt=f"You are a helpful assistant. Today's date is {datetime.now().strftime("%Y-%m-%d")}.", tools=tools, checkpointer=checkpointer)
-      config = {"configurable": {"thread_id": f"{ prompt.thread_id}"}}
+      config = {"configurable": {"thread_id": f"{jwt["username"]}_{ prompt.thread_id}"}}
       res = graph.invoke({"messages": [("human", f"{prompt.content}")]}, config)
       
       last_message = res["messages"][-1].content

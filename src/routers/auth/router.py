@@ -42,8 +42,6 @@ class Token(BaseModel):
     token_type: str
 
 def authenticate(email: str, password: str, db):
-    print("authenticate...")
-
     account = db.query(Account).filter(Account.email == email).first()
     if not account:
         return False
@@ -83,8 +81,6 @@ async def login_for_access_token(body: LoginRequestBody, db: db_dependency, requ
     if not account:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user")
     
-    print("1")
-
     print('calling create_access_token()...')
     token = create_access_token(account.email, account.id, timedelta(hours=12))
     response = Response()
