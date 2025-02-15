@@ -43,10 +43,7 @@ def run_migrations_offline() -> None:
 
     """
     # url = config.get_main_option("sqlalchemy.url")
-    print('---')
-    print(os.getenv("DB_URI"))
-    print('---')
-    url = config.set_main_option('sqlalchemy.url', os.getenv("DB_URI"))
+    url = config.set_main_option('sqlalchemy.url', os.getenv("POSTGRES_URL"))
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -65,10 +62,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    print('---')
-    print(os.getenv("DB_URI"))
-    print('---')
-    config.set_main_option('sqlalchemy.url', os.getenv("DB_URI"))
+    config.set_main_option('sqlalchemy.url', os.getenv("POSTGRES_URL"))
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",

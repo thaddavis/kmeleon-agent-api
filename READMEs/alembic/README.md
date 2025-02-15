@@ -5,7 +5,7 @@ uv add alembic
 uv run alembic init alembic
 ```
 
-Then tweaked the `alembic/env.py` file to pull the DB_URI from the .env file
+Then tweaked the `alembic/env.py` file to pull the POSTGRES_URL from the .env file
 
 ## FYI
 

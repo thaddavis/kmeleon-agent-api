@@ -2,13 +2,13 @@
 
 Documenting the steps of creating and running a migration for future reference
 
-## log
+## Steps
 
 - alembic revision -m "add reset token to account table"
-- fill in the upgrade & downgrade logic
+- then fill in the upgrade & downgrade logic
 - alembic upgrade head
 
-## TIP
+## Tips
 
 - If you run into issues, try some of these commands...
     - alembic downgrade -1

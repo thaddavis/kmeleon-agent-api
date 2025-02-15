@@ -6,7 +6,7 @@ import os
 
 load_dotenv()
 
-SQL_ALCHEMY_DATABASE_URL = os.getenv("DB_URI")
+SQL_ALCHEMY_DATABASE_URL = os.getenv("POSTGRES_URL")
 
 engine = create_engine(SQL_ALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

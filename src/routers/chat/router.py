@@ -38,7 +38,7 @@ router = APIRouter()
 @limiter.limit("10/minute")
 def prompt(prompt: Prompt, jwt: jwt_dependency, request: Request):
     with ConnectionPool(
-      conninfo=os.getenv("DB_URI"),
+      conninfo=os.getenv("POSTGRES_URL"),
       max_size=20,
       kwargs=connection_kwargs,
     ) as pool:
